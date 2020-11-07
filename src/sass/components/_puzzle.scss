@@ -1,0 +1,15 @@
+.puzzle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background-color: $puzzle-content-color;
+  &__content {
+    display: grid;
+    grid-row-gap: 0.1rem;
+    grid-column-gap: 0.1rem;
+
+    .item {
+      border: 0.1rem solid black;
+    }
+  }
+}

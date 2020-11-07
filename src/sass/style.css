@@ -1,0 +1,32 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  background: lightgreen;
+}
+
+.puzzle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background-color: white;
+}
+
+.puzzle__content {
+  display: -ms-grid;
+  display: grid;
+  grid-row-gap: 0.1rem;
+  grid-column-gap: 0.1rem;
+}
+
+.puzzle__content .item {
+  border: 0.1rem solid black;
+}
+/*# sourceMappingURL=style.css.map */
