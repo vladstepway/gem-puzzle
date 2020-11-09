@@ -41,15 +41,23 @@ export default class PuzzleBoard {
     );
     this.createCells(puzzleContent);
   }
+  shufflePuzzles(puzzleAmount) {
+    return [...Array(puzzleAmount - 1).keys()].sort(() => Math.random() - 0.5);
+  }
 
   createCells(puzzleContent) {
     const puzzleSize = this.boardSize * this.boardSize;
     this.currentPositions.push(emptyCell);
-    for (let i = 1; i < puzzleSize; i++) {
+    const randomArray = this.shufflePuzzles(puzzleSize);
+    for (let i = 1; i <= randomArray.length; i++) {
       const left = i % this.boardSize;
       const top = (i - left) / this.boardSize;
       const position = { left, top };
-      const item = new PuzzleItem(i, puzzleContent, position);
+      const item = new PuzzleItem(
+        randomArray[i - 1] + 1,
+        puzzleContent,
+        position
+      );
       item.div.addEventListener('click', this.changePosition.bind(this, item));
 
       this.currentPositions.push({
@@ -62,7 +70,13 @@ export default class PuzzleBoard {
   }
 
   changePosition = (item) => {
-    const puzzleCell = this.currentPositions[item.number];
+    const currentPositionsCopy = JSON.parse(
+      JSON.stringify(this.currentPositions)
+    );
+    const currentCellIndex = currentPositionsCopy
+      .map((n) => (n.element ? n.element.number : 0))
+      .indexOf(item.number);
+    const puzzleCell = this.currentPositions[currentCellIndex];
     if (this.isCloseCell(puzzleCell)) {
       return;
     } else {
@@ -84,11 +98,8 @@ export default class PuzzleBoard {
   };
 
   isCloseCell(currentCell) {
-    console.log(currentCell);
     const leftDifference = Math.abs(emptyCell.left - currentCell.left);
     const topDifference = Math.abs(emptyCell.top - currentCell.top);
-    
-    console.log(topDifference + leftDifference);
     return leftDifference + topDifference > 1;
   }
 }
