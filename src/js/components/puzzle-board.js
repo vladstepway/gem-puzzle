@@ -3,10 +3,6 @@ import PuzzleItem from './puzzle-item';
 import * as constants from './../utils/constants';
 
 const main = create('main', '', null);
-const emptyCell = {
-  top: 0,
-  left: 0,
-};
 export default class PuzzleBoard {
   constructor({ size }) {
     // this.settings = settings;
@@ -15,18 +11,29 @@ export default class PuzzleBoard {
 
   init() {
     this.container = create('div', 'puzzle', null, main);
-    this.infoBoard = create('div', 'puzzle__info', null, this.container);
-
-    this.timer = create('div', 'timer', null, this.infoBoard);
-    this.moves = create('div', 'moves', null, this.infoBoard);
-    this.sizeBoard = create('div', 'size__board', null, this.infoBoard);
-    document.body.prepend(main);
     this.initInfoBoard();
+    document.body.prepend(main);
     return this;
   }
 
   initInfoBoard() {
-    this.sizeBoard.innerHTML = `${this.boardSize}x${this.boardSize}`;
+    this.infoBoard = create('div', 'puzzle__info', null, this.container);
+    this.resetButton = create(
+      'button',
+      'reset_button',
+      'reload',
+      this.infoBoard
+    );
+    this.timer = create('div', 'timer', 'time', this.infoBoard);
+    this.movesCount = 0;
+    this.moves = create('div', 'moves', 'moves', this.infoBoard);
+    this.sizeBoard = create(
+      'div',
+      'size__board',
+      `${this.boardSize}x${this.boardSize}`,
+      this.infoBoard
+    );
+    this.resetButton.addEventListener('click', this.reloadGame);
   }
 
   generatePuzzles() {
@@ -39,28 +46,31 @@ export default class PuzzleBoard {
       null,
       this.container
     );
+    puzzleContent.style.width = `${this.boardSize * constants.CELL_SIZE}px`;
+    puzzleContent.style.height = `${this.boardSize * constants.CELL_SIZE}px`;
+
     this.createCells(puzzleContent);
   }
   shufflePuzzles(puzzleAmount) {
-    return [...Array(puzzleAmount - 1).keys()].sort(() => Math.random() - 0.5);
+    return [...Array(puzzleAmount).keys()].sort(() => Math.random() - 0.5);
   }
 
   createCells(puzzleContent) {
     const puzzleSize = this.boardSize * this.boardSize;
-    this.currentPositions.push(emptyCell);
     const randomArray = this.shufflePuzzles(puzzleSize);
-    for (let i = 1; i <= randomArray.length; i++) {
+    for (let i = 0; i < randomArray.length; i++) {
       const left = i % this.boardSize;
       const top = (i - left) / this.boardSize;
       const position = { left, top };
-      const item = new PuzzleItem(
-        randomArray[i - 1] + 1,
-        puzzleContent,
-        position
-      );
+      const value = randomArray[i];
+      const item = new PuzzleItem(value, puzzleContent, position);
+      if (value === 0) {
+        this.emptyCell = item.position;
+      }
       item.div.addEventListener('click', this.changePosition.bind(this, item));
 
       this.currentPositions.push({
+        value,
         left: position.left,
         top: position.top,
         element: item,
@@ -77,29 +87,43 @@ export default class PuzzleBoard {
       .map((n) => (n.element ? n.element.number : 0))
       .indexOf(item.number);
     const puzzleCell = this.currentPositions[currentCellIndex];
-    if (this.isCloseCell(puzzleCell)) {
+    if (this.isNotClosestCell(puzzleCell)) {
       return;
     } else {
       puzzleCell.element.div.style.left = `${
-        emptyCell.left * constants.CELL_SIZE
+        this.emptyCell.left * constants.CELL_SIZE
       }px`;
       puzzleCell.element.div.style.top = `${
-        emptyCell.top * constants.CELL_SIZE
+        this.emptyCell.top * constants.CELL_SIZE
       }px`;
 
-      const { left, top } = emptyCell;
+      const { left, top } = this.emptyCell;
 
-      emptyCell.left = puzzleCell.left;
-      emptyCell.top = puzzleCell.top;
+      this.emptyCell.left = puzzleCell.left;
+      this.emptyCell.top = puzzleCell.top;
 
       puzzleCell.left = left;
       puzzleCell.top = top;
     }
+    const isEndOfTheGame = this.currentPositions.every((p) => {
+      return p.value === p.top * this.boardSize + p.left;
+    });
+    if (isEndOfTheGame) {
+      this.endOfTheGame();
+    }
   };
 
-  isCloseCell(currentCell) {
-    const leftDifference = Math.abs(emptyCell.left - currentCell.left);
-    const topDifference = Math.abs(emptyCell.top - currentCell.top);
+  isNotClosestCell(currentCell) {
+    const leftDifference = Math.abs(this.emptyCell.left - currentCell.left);
+    const topDifference = Math.abs(this.emptyCell.top - currentCell.top);
     return leftDifference + topDifference > 1;
+  }
+
+  endOfTheGame() {
+    alert('You win');
+  }
+
+  reloadGame() {
+    console.log('game is reloaded');
   }
 }

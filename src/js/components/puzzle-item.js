@@ -6,10 +6,10 @@ export default class PuzzleItem {
     this.number = number;
     this.content = content;
     this.position = position;
-    this.div = create('div', 'item', number, content);
+    const cellNumber = number === 0 ? '' : number;
+    this.div = create('div', 'item', cellNumber, content);
     this.div.style.left = `${position.left * constants.CELL_SIZE}px`;
     this.div.style.top = `${position.top * constants.CELL_SIZE}px`;
-    this.div.innerHTML = number;
+    this.div.innerHTML = cellNumber;
   }
 }
- 
