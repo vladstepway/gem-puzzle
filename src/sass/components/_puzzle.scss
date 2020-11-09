@@ -4,6 +4,8 @@
   border: 0.1rem solid black;
   &__info {
     font-size: 2.4rem;
+    display: flex;
+    justify-content: space-around;
   }
 
   &__content {
@@ -13,6 +15,7 @@
     // grid-row-gap: 0.1rem;
     // grid-column-gap: 0.1rem;
     border: 0.1rem solid black;
+    margin: auto;
 
     .item {
       display: flex;
