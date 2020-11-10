@@ -11,9 +11,6 @@
   &__content {
     position: relative;
 
-    // display: grid;
-    // grid-row-gap: 0.1rem;
-    // grid-column-gap: 0.1rem;
     border: 0.1rem solid black;
     margin: auto;
 
@@ -28,6 +25,13 @@
       position: absolute;
       transition: all 0.4s;
       cursor: pointer;
+      &-0 {
+        border: 0.1rem solid black;
+        transition: none;
+        width: 10rem;
+        height: 10rem;
+        position: absolute;
+      }
     }
   }
 }
