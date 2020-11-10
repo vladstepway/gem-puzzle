@@ -8,9 +8,29 @@ export default class PuzzleItem {
     this.position = position;
     const cellNumber = number === 0 ? '' : number;
     const cellClass = number === 0 ? 'item-0' : 'item';
-    this.div = create('div', cellClass, cellNumber, content);
+    if (cellClass === 'item') {
+      this.div = create('div', cellClass, cellNumber, content, [
+        'draggable',
+        'true',
+      ]);
+    } else {
+      this.div = create('div', cellClass, cellNumber, content);
+    }
+
     this.div.style.left = `${position.left * constants.CELL_SIZE}px`;
     this.div.style.top = `${position.top * constants.CELL_SIZE}px`;
     this.div.innerHTML = cellNumber;
+    this.connectDrag();
+  }
+
+  connectDrag() {
+    const item = this;
+    item.div.addEventListener('dragstart', (e) => {
+      e.dataTransfer.effectAllowed = 'move';
+      // console.log(e, item.position);
+    });
+    item.div.addEventListener('dragend', (e) => {
+      // console.log(e, item.position);
+    });
   }
 }
