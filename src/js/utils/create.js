@@ -28,7 +28,7 @@ export default function create(el, classNames, children, parent, ...dataAttr) {
       }
       if (
         attrName.match(
-          /value|placeholder|cols|rows|autocorrect|spellcheck|src|alt/,
+          /value|placeholder|cols|rows|autocorrect|spellcheck|src|alt|draggable/,
         )
       ) {
         element.setAttribute(attrName, attrValue);

@@ -46,10 +46,12 @@ export default class PuzzleBoard {
       null,
       this.container
     );
+    this.puzzleContent = puzzleContent;
     puzzleContent.style.width = `${this.boardSize * constants.CELL_SIZE}px`;
     puzzleContent.style.height = `${this.boardSize * constants.CELL_SIZE}px`;
 
     this.createCells(puzzleContent);
+    this.connectDroppable();
   }
   shufflePuzzles(puzzleAmount) {
     return [...Array(puzzleAmount).keys()].sort(() => Math.random() - 0.5);
@@ -66,12 +68,8 @@ export default class PuzzleBoard {
       const item = new PuzzleItem(value, puzzleContent, position);
       if (value === 0) {
         this.emptyCell = item;
-        // this.emptyCell.value = value;
       }
-      // console.log(item);
-      // if (item.number !== 0) {
       item.div.addEventListener('click', this.changePosition.bind(this, item));
-      // }
 
       this.currentPositions.push({
         value,
@@ -83,23 +81,23 @@ export default class PuzzleBoard {
     }
   }
 
-  changePosition = (item) => {
+  findCell(item) {
     const currentPositionsCopy = JSON.parse(
       JSON.stringify(this.currentPositions)
     );
-    const currentCellIndex = currentPositionsCopy
+    const index = currentPositionsCopy
       .map((n) => (n.element ? n.element.number : 0))
       .indexOf(item.number);
-    const emptyCellIndex = currentPositionsCopy
-      .map((n) => (n.element ? n.element.number : 0))
-      .indexOf(this.emptyCell.number);
-    const emptyPuzzleCell = this.currentPositions[emptyCellIndex];
-    const puzzleCell = this.currentPositions[currentCellIndex];
-    
+    return this.currentPositions[index];
+  }
+
+  changePosition = (item) => {
+    const emptyPuzzleCell = this.findCell(this.emptyCell);
+    const puzzleCell = this.findCell(item);
+
     if (this.isNotClosestCell(puzzleCell, emptyPuzzleCell)) {
       return;
     } else {
-
       puzzleCell.element.div.style.left = `${
         emptyPuzzleCell.left * constants.CELL_SIZE
       }px`;
@@ -139,10 +137,6 @@ export default class PuzzleBoard {
   isNotClosestCell(currentCell, emptyCell) {
     const leftDifference = Math.abs(emptyCell.left - currentCell.left);
     const topDifference = Math.abs(emptyCell.top - currentCell.top);
-    console.log('leftDifference', leftDifference);
-    console.log('rightDifference', topDifference);
-    console.log(leftDifference + topDifference);
-    console.log(leftDifference + topDifference > 1);
     return leftDifference + topDifference > 1;
   }
 
@@ -152,5 +146,36 @@ export default class PuzzleBoard {
 
   reloadGame() {
     console.log('game is reloaded');
+  }
+
+  connectDroppable() {
+    let dragged = '';
+    const puzzleContent = this.puzzleContent;
+    puzzleContent.addEventListener('drag', (e) => {}, false);
+    puzzleContent.addEventListener('dragenter', (e) => {
+      e.preventDefault();
+      console.log(e);
+      dragged = e.relatedTarget;
+    });
+    puzzleContent.addEventListener('dragover', (e) => {
+      e.preventDefault();
+    });
+
+    puzzleContent.addEventListener('dragleave', (e) => {
+    });
+
+    puzzleContent.addEventListener(
+      'drop',
+      (e) => {
+        e.preventDefault();
+        const puzzleCell = '';
+        const emptyCell = '';
+        // console.log(dragged);
+        // dragged.parentNode.removeChild(dragged);
+        // e.target.appendChild(dragged);
+        // console.log('drop', e.target);
+      },
+      false
+    );
   }
 }
