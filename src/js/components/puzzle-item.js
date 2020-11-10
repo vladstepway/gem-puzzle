@@ -7,7 +7,8 @@ export default class PuzzleItem {
     this.content = content;
     this.position = position;
     const cellNumber = number === 0 ? '' : number;
-    this.div = create('div', 'item', cellNumber, content);
+    const cellClass = number === 0 ? 'item-0' : 'item';
+    this.div = create('div', cellClass, cellNumber, content);
     this.div.style.left = `${position.left * constants.CELL_SIZE}px`;
     this.div.style.top = `${position.top * constants.CELL_SIZE}px`;
     this.div.innerHTML = cellNumber;

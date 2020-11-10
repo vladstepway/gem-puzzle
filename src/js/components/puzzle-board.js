@@ -65,9 +65,13 @@ export default class PuzzleBoard {
       const value = randomArray[i];
       const item = new PuzzleItem(value, puzzleContent, position);
       if (value === 0) {
-        this.emptyCell = item.position;
+        this.emptyCell = item;
+        // this.emptyCell.value = value;
       }
+      // console.log(item);
+      // if (item.number !== 0) {
       item.div.addEventListener('click', this.changePosition.bind(this, item));
+      // }
 
       this.currentPositions.push({
         value,
@@ -86,24 +90,43 @@ export default class PuzzleBoard {
     const currentCellIndex = currentPositionsCopy
       .map((n) => (n.element ? n.element.number : 0))
       .indexOf(item.number);
+    const emptyCellIndex = currentPositionsCopy
+      .map((n) => (n.element ? n.element.number : 0))
+      .indexOf(this.emptyCell.number);
+    const emptyPuzzleCell = this.currentPositions[emptyCellIndex];
     const puzzleCell = this.currentPositions[currentCellIndex];
-    if (this.isNotClosestCell(puzzleCell)) {
+    
+    if (this.isNotClosestCell(puzzleCell, emptyPuzzleCell)) {
       return;
     } else {
+
       puzzleCell.element.div.style.left = `${
-        this.emptyCell.left * constants.CELL_SIZE
+        emptyPuzzleCell.left * constants.CELL_SIZE
       }px`;
-      puzzleCell.element.div.style.top = `${
-        this.emptyCell.top * constants.CELL_SIZE
+      emptyPuzzleCell.element.div.style.left = `${
+        puzzleCell.left * constants.CELL_SIZE
       }px`;
 
-      const { left, top } = this.emptyCell;
+      puzzleCell.element.div.style.top = `${
+        emptyPuzzleCell.top * constants.CELL_SIZE
+      }px`;
+      emptyPuzzleCell.element.div.style.top = `${
+        puzzleCell.top * constants.CELL_SIZE
+      }px`;
+
+      const emptyLeft = this.emptyCell.position.left;
+      const emptyTop = this.emptyCell.position.top;
 
       this.emptyCell.left = puzzleCell.left;
       this.emptyCell.top = puzzleCell.top;
+      this.emptyCell.position.left = puzzleCell.left;
+      this.emptyCell.position.top = puzzleCell.top;
 
-      puzzleCell.left = left;
-      puzzleCell.top = top;
+      emptyPuzzleCell.left = puzzleCell.left;
+      emptyPuzzleCell.top = puzzleCell.top;
+
+      puzzleCell.left = emptyLeft;
+      puzzleCell.top = emptyTop;
     }
     const isEndOfTheGame = this.currentPositions.every((p) => {
       return p.value === p.top * this.boardSize + p.left;
@@ -113,9 +136,13 @@ export default class PuzzleBoard {
     }
   };
 
-  isNotClosestCell(currentCell) {
-    const leftDifference = Math.abs(this.emptyCell.left - currentCell.left);
-    const topDifference = Math.abs(this.emptyCell.top - currentCell.top);
+  isNotClosestCell(currentCell, emptyCell) {
+    const leftDifference = Math.abs(emptyCell.left - currentCell.left);
+    const topDifference = Math.abs(emptyCell.top - currentCell.top);
+    console.log('leftDifference', leftDifference);
+    console.log('rightDifference', topDifference);
+    console.log(leftDifference + topDifference);
+    console.log(leftDifference + topDifference > 1);
     return leftDifference + topDifference > 1;
   }
 
