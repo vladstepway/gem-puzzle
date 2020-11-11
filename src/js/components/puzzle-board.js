@@ -199,6 +199,8 @@ export default class PuzzleBoard {
   reloadGame = () => {
     this.changeMovesCount(0);
     clearInterval(this.timerId);
+    this.sec = 0;
+    this.min = 0;
     this.container.removeChild(this.puzzleContent);
 
     this.generatePuzzles();
