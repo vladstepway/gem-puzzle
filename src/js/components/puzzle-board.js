@@ -24,9 +24,22 @@ export default class PuzzleBoard {
       'reload',
       this.infoBoard
     );
-    this.timer = create('div', 'timer', 'time', this.infoBoard);
+    this.timeCount = '00:00';
+    this.min = 0;
+    this.sec = 0;
+    this.timer = create(
+      'div',
+      'timer',
+      `time ${this.timeCount}`,
+      this.infoBoard
+    );
     this.movesCount = 0;
-    this.moves = create('div', 'moves', 'moves', this.infoBoard);
+    this.moves = create(
+      'div',
+      'moves',
+      `moves ${this.movesCount}`,
+      this.infoBoard
+    );
     this.sizeBoard = create(
       'div',
       'size__board',
@@ -37,6 +50,7 @@ export default class PuzzleBoard {
   }
 
   generatePuzzles() {
+    this.timer.innerHTML = 'time 00:00';
     this.puzzles = [];
     this.currentPositions = [];
     // Puzzle content
@@ -106,39 +120,69 @@ export default class PuzzleBoard {
     if (this.isNotClosestCell(puzzleCell, emptyPuzzleCell)) {
       return;
     } else {
-      puzzleCell.element.div.style.left = `${
-        emptyPuzzleCell.left * constants.CELL_SIZE
-      }px`;
-      emptyPuzzleCell.element.div.style.left = `${
-        puzzleCell.left * constants.CELL_SIZE
-      }px`;
+      if (puzzleCell.value === emptyPuzzleCell.value) {
+        return;
+      } else {
+        puzzleCell.element.div.style.left = `${
+          emptyPuzzleCell.left * constants.CELL_SIZE
+        }px`;
+        emptyPuzzleCell.element.div.style.left = `${
+          puzzleCell.left * constants.CELL_SIZE
+        }px`;
 
-      puzzleCell.element.div.style.top = `${
-        emptyPuzzleCell.top * constants.CELL_SIZE
-      }px`;
-      emptyPuzzleCell.element.div.style.top = `${
-        puzzleCell.top * constants.CELL_SIZE
-      }px`;
+        puzzleCell.element.div.style.top = `${
+          emptyPuzzleCell.top * constants.CELL_SIZE
+        }px`;
+        emptyPuzzleCell.element.div.style.top = `${
+          puzzleCell.top * constants.CELL_SIZE
+        }px`;
 
-      const emptyLeft = this.emptyCell.position.left;
-      const emptyTop = this.emptyCell.position.top;
+        const emptyLeft = this.emptyCell.position.left;
+        const emptyTop = this.emptyCell.position.top;
 
-      this.emptyCell.left = puzzleCell.left;
-      this.emptyCell.top = puzzleCell.top;
-      this.emptyCell.position.left = puzzleCell.left;
-      this.emptyCell.position.top = puzzleCell.top;
+        this.emptyCell.left = puzzleCell.left;
+        this.emptyCell.top = puzzleCell.top;
+        this.emptyCell.position.left = puzzleCell.left;
+        this.emptyCell.position.top = puzzleCell.top;
 
-      emptyPuzzleCell.left = puzzleCell.left;
-      emptyPuzzleCell.top = puzzleCell.top;
+        emptyPuzzleCell.left = puzzleCell.left;
+        emptyPuzzleCell.top = puzzleCell.top;
 
-      puzzleCell.left = emptyLeft;
-      puzzleCell.top = emptyTop;
+        puzzleCell.left = emptyLeft;
+        puzzleCell.top = emptyTop;
+        this.changeMovesCount(++this.movesCount);
+      }
     }
+    if (this.movesCount === 1) {
+      this.timerId = setInterval(this.changeTimeCounter, 1000);
+    }
+
     const isEndOfTheGame = this.currentPositions.every((p) => {
       return p.value === p.top * this.boardSize + p.left;
     });
     if (isEndOfTheGame) {
       this.endOfTheGame();
+    }
+  };
+
+  changeTimeCounter = () => {
+    ++this.sec;
+    if (this.sec === 60) {
+      this.sec = 0;
+      ++this.min;
+    }
+    if (this.min < 10) {
+      if (this.sec < 10) {
+        this.timer.innerHTML = `time 0${this.min}:0${this.sec}`;
+      } else {
+        this.timer.innerHTML = `time 0${this.min}:${this.sec}`;
+      }
+    } else {
+      if (this.sec < 10) {
+        this.timer.innerHTML = `time ${this.min}:0${this.sec}`;
+      } else {
+        this.timer.innerHTML = `time ${++this.min}:${this.sec}`;
+      }
     }
   };
 
@@ -153,9 +197,16 @@ export default class PuzzleBoard {
   }
 
   reloadGame = () => {
+    this.changeMovesCount(0);
+    clearInterval(this.timerId);
     this.container.removeChild(this.puzzleContent);
+
     this.generatePuzzles();
   };
+  changeMovesCount(count) {
+    this.movesCount = count;
+    this.moves.innerHTML = `moves ${this.movesCount}`;
+  }
 
   connectDroppable() {
     let dragged = '';
