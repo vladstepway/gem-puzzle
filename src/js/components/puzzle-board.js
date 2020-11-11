@@ -81,7 +81,7 @@ export default class PuzzleBoard {
     }
   }
 
-  findCell(item) {
+  findPuzzleItem(item) {
     const currentPositionsCopy = JSON.parse(
       JSON.stringify(this.currentPositions)
     );
@@ -91,9 +91,17 @@ export default class PuzzleBoard {
     return this.currentPositions[index];
   }
 
+  findPuzzleItemByValue(value) {
+    const currentPositionsCopy = JSON.parse(
+      JSON.stringify(this.currentPositions)
+    );
+    const index = currentPositionsCopy.map((n) => n.value).indexOf(+value);
+    return this.currentPositions[index];
+  }
+
   changePosition = (item) => {
-    const emptyPuzzleCell = this.findCell(this.emptyCell);
-    const puzzleCell = this.findCell(item);
+    const emptyPuzzleCell = this.findPuzzleItem(this.emptyCell);
+    const puzzleCell = this.findPuzzleItem(item);
 
     if (this.isNotClosestCell(puzzleCell, emptyPuzzleCell)) {
       return;
@@ -145,37 +153,28 @@ export default class PuzzleBoard {
   }
 
   reloadGame() {
-    console.log('game is reloaded');
+    this.container.removeChild(this.puzzleContent);
+    this.generatePuzzles();
   }
 
   connectDroppable() {
     let dragged = '';
     const puzzleContent = this.puzzleContent;
-    puzzleContent.addEventListener('drag', (e) => {}, false);
-    puzzleContent.addEventListener('dragenter', (e) => {
+    puzzleContent.addEventListener('drag', (e) => {
       e.preventDefault();
-      console.log(e);
-      dragged = e.relatedTarget;
+      dragged = e.target;
     });
     puzzleContent.addEventListener('dragover', (e) => {
       e.preventDefault();
     });
-
-    puzzleContent.addEventListener('dragleave', (e) => {
+    puzzleContent.addEventListener('drop', (e) => {
+      e.preventDefault();
+      if (e.target.innerText === '') {
+        const puzzleItem = this.findPuzzleItemByValue(dragged.innerText);
+        this.changePosition(puzzleItem.element);
+      } else {
+        return;
+      }
     });
-
-    puzzleContent.addEventListener(
-      'drop',
-      (e) => {
-        e.preventDefault();
-        const puzzleCell = '';
-        const emptyCell = '';
-        // console.log(dragged);
-        // dragged.parentNode.removeChild(dragged);
-        // e.target.appendChild(dragged);
-        // console.log('drop', e.target);
-      },
-      false
-    );
   }
 }
