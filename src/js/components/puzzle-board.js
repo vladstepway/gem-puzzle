@@ -152,10 +152,10 @@ export default class PuzzleBoard {
     alert('You win');
   }
 
-  reloadGame() {
+  reloadGame = () => {
     this.container.removeChild(this.puzzleContent);
     this.generatePuzzles();
-  }
+  };
 
   connectDroppable() {
     let dragged = '';
