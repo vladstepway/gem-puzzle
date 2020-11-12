@@ -26,7 +26,8 @@ export default class PuzzleItem {
   connectDrag() {
     const item = this;
     item.div.addEventListener('dragstart', (e) => {
-      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.effectAllowed = 'all';
+      e.dataTransfer.dropEffect = 'move';
     });
     item.div.addEventListener('dragend', (e) => {
     });

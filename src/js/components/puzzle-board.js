@@ -172,6 +172,7 @@ export default class PuzzleBoard {
         puzzleCell.left = emptyLeft;
         puzzleCell.top = emptyTop;
         this.changeMovesCount(++this.movesCount);
+        this.playSound('move');
       }
     }
     if (this.movesCount === 1) {
@@ -185,7 +186,11 @@ export default class PuzzleBoard {
       this.endOfTheGame();
     }
   };
-
+  playSound = (sound) => {
+    const audio = new Audio();
+    audio.src = `./../../src/assets/sounds/${sound}.mp3`;
+    audio.autoplay = true;
+  };
   changeTimeCounter = () => {
     ++this.sec;
     if (this.sec === 60) {
@@ -213,9 +218,10 @@ export default class PuzzleBoard {
     return leftDifference + topDifference > 1;
   }
 
-  endOfTheGame() {
+  endOfTheGame = () => {
+    this.playSound('win');
     alert('You win');
-  }
+  };
 
   reloadGame = () => {
     this.changeMovesCount(0);
@@ -225,6 +231,7 @@ export default class PuzzleBoard {
     this.container.removeChild(this.puzzleContent);
 
     this.generatePuzzles();
+    this.playSound('reload');
   };
   changeMovesCount(count) {
     this.movesCount = count;
@@ -237,6 +244,8 @@ export default class PuzzleBoard {
     puzzleContent.addEventListener('drag', (e) => {
       e.preventDefault();
       dragged = e.target;
+    });
+    puzzleContent.addEventListener('dragstart', (e) => {
     });
     puzzleContent.addEventListener('dragover', (e) => {
       e.preventDefault();
@@ -252,8 +261,9 @@ export default class PuzzleBoard {
     });
   }
 
-  openMenu() {
+  openMenu = () => {
     const menu = document.querySelector('.menu_overlay');
     menu.classList.add('menu_overlay-active');
-  }
+    this.playSound('menu');
+  };
 }

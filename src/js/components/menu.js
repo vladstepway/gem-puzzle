@@ -29,6 +29,7 @@ export default class Menu {
     }
     this.puzzleBoard = new PuzzleBoard(this.settings);
     this.puzzleBoard.init().generatePuzzles();
+    this.puzzleBoard.playSound('new');
     this.overlay.classList.remove('menu_overlay-active');
   };
 
@@ -36,6 +37,7 @@ export default class Menu {
     if (!this.puzzleBoard) {
       return;
     }
+    this.puzzleBoard.playSound('resume');
     this.overlay.classList.remove('menu_overlay-active');
   };
 
@@ -50,6 +52,7 @@ export default class Menu {
     if (!this.puzzleBoard) {
       return;
     }
+    this.playSound('save');
     this.overlay.classList.remove('menu_overlay-active');
   };
 }
