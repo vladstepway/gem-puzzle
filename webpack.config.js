@@ -42,6 +42,11 @@ module.exports = (env, options) => {
           use: [{ loader: 'file-loader' }],
         },
         {
+          test: /\.mp3$/,
+          include: '/src',
+          loader: 'file-loader',
+        },
+        {
           test: /\.html$/i,
           loader: 'html-loader',
         },
