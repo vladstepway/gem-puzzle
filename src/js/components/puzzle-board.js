@@ -46,6 +46,8 @@ export default class PuzzleBoard {
       `${this.boardSize}x${this.boardSize}`,
       this.infoBoard
     );
+    this.menuButton = create('button', 'menu_button', 'menu', this.infoBoard);
+    this.menuButton.addEventListener('click', this.openMenu);
     this.resetButton.addEventListener('click', this.reloadGame);
   }
 
@@ -248,5 +250,10 @@ export default class PuzzleBoard {
         return;
       }
     });
+  }
+
+  openMenu() {
+    const menu = document.querySelector('.menu_overlay');
+    menu.classList.add('menu_overlay-active');
   }
 }
