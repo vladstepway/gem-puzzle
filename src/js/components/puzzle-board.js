@@ -68,7 +68,26 @@ export default class PuzzleBoard {
     this.connectDroppable();
   }
   shufflePuzzles(puzzleAmount) {
-    return [...Array(puzzleAmount).keys()].sort(() => Math.random() - 0.5);
+    const randomPuzzle = [...Array(puzzleAmount).keys()].sort(
+      () => Math.random() - 0.5
+    );
+    return this.isValidPuzzleCombination(puzzleAmount)
+      ? randomPuzzle
+      : this.shufflePuzzles(puzzleAmount);
+  }
+
+  isValidPuzzleCombination(randomPuzzle) {
+    let sum = 0;
+    for (let i = 0; i < randomPuzzle.length; i++) {
+      let counter = 0;
+      for (let j = i + 1; j < randomPuzzle.length - 1; j++) {
+        if (randomPuzzle[i] > randomPuzzle[j]) {
+          counter++;
+        }
+      }
+      sum += counter;
+    }
+    return sum % 2 === 0;
   }
 
   createCells(puzzleContent) {
