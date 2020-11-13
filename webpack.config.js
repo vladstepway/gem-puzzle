@@ -2,6 +2,7 @@ const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = (env, options) => {
   const isProduction = options.mode === 'production';
@@ -25,6 +26,9 @@ module.exports = (env, options) => {
       new MiniCssExtractPlugin({
         filename: '[contenthash].css',
       }),
+      new CopyPlugin({
+        patterns: [{ from: './src/assets/sounds', to: './sounds' }],
+      }),
     ],
 
     module: {
@@ -38,7 +42,7 @@ module.exports = (env, options) => {
           },
         },
         {
-          test: /\.(png|svg|jpe?g|gif|mp3)$/i,
+          test: /\.(png|svg|jpe?g|gif)$/i,
           use: [{ loader: 'file-loader' }],
         },
         {
