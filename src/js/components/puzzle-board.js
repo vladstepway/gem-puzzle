@@ -188,7 +188,7 @@ export default class PuzzleBoard {
   };
   playSound = (sound) => {
     const audio = new Audio();
-    audio.src = `./../../src/assets/sounds/${sound}.mp3`;
+    audio.src = `./sounds/${sound}.mp3`;
     audio.autoplay = true;
   };
   changeTimeCounter = () => {
@@ -245,8 +245,7 @@ export default class PuzzleBoard {
       e.preventDefault();
       dragged = e.target;
     });
-    puzzleContent.addEventListener('dragstart', (e) => {
-    });
+    puzzleContent.addEventListener('dragstart', (e) => {});
     puzzleContent.addEventListener('dragover', (e) => {
       e.preventDefault();
     });
