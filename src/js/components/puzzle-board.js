@@ -47,7 +47,7 @@ export default class PuzzleBoard {
       '8x8': 8,
     };
     for (const s in sizes) {
-      if ({}.hasOwnproperty.call(sizes, s)) {
+      if (Object.prototype.hasOwnProperty.call(sizes, s)) {
         sizeSettings.push(
           create('option', '', s, null, ['value', `${sizes[s]}`])
         );
