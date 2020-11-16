@@ -1,16 +1,15 @@
 .game-list {
-  z-index: 3;
-  background-color: aqua;
+  z-index: 4;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   list-style-type: none;
-  transition: all 1s;
   &__item {
-    color: black;
+    color: $puzzle-content-color;
     margin: 1rem;
-    border: 0.1rem solid black;
+    padding: 1rem;
+    border: 0.1rem solid $puzzle-content-color;
   }
   &__item:hover {
     background-color: $puzzle-content-color;

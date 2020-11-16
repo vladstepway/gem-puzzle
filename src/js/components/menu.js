@@ -39,15 +39,18 @@ export default class Menu {
     this.puzzleBoard = new PuzzleBoard(this.settings);
     this.puzzleBoard.init().generatePuzzles();
     this.puzzleBoard.playSound('new');
+    this.removeGameList();
     this.overlay.classList.remove('menu_overlay-active');
   };
 
   resumeGame = () => {
+   
     if (!this.puzzleBoard) {
       return;
     }
     this.puzzleBoard.timeCounter.resumeTimer();
     this.puzzleBoard.playSound('resume');
+    this.removeGameList();
     this.overlay.classList.remove('menu_overlay-active');
   };
 
@@ -56,7 +59,16 @@ export default class Menu {
       return;
     }
     this.puzzleBoard.reloadGame();
+    this.removeGameList();
     this.overlay.classList.remove('menu_overlay-active');
+  };
+
+  removeGameList = () => {
+    if (this.gameList) {
+      const menu = document.querySelector('.menu_overlay');
+      menu.removeChild(document.querySelector('.game-list'));
+      this.gameList = undefined;
+    }
   };
 
   saveGame = () => {
@@ -68,6 +80,7 @@ export default class Menu {
     storage.set('savedGames', this.savedGames);
     this.puzzleBoard.timeCounter.resumeTimer();
     this.puzzleBoard.playSound('save');
+    this.removeGameList();
     this.overlay.classList.remove('menu_overlay-active');
   };
 
@@ -92,7 +105,8 @@ export default class Menu {
     this.puzzleBoard.init().generatePuzzles();
     if (this.gameList) {
       const menu = document.querySelector('.menu_overlay');
-      menu.removeChild(menu.firstChild);
+      menu.removeChild(document.querySelector('.game-list'));
+      this.gameList = undefined;
     }
     this.puzzleBoard.playSound('load');
     this.puzzleBoard.timeCounter.resumeTimer();
@@ -102,7 +116,8 @@ export default class Menu {
     this.gameList = create('ul', 'game-list', null, null);
     games.forEach((game) => {
       const savedGame = create('li', 'game-list__item', null, this.gameList);
-      savedGame.innerHTML = `<div>Size: ${game.size}, moves: ${game.moves}, time: ${game.time.value}</div>`;
+      savedGame.innerHTML = `<div>size: ${game.size}, moves: ${game.moves},
+       time: ${game.time.value} - ${game.saveDate}</div>`;
       savedGame.addEventListener('click', this.selectGame.bind(this, game));
     });
     document.querySelector('.menu_overlay').prepend(this.gameList);
