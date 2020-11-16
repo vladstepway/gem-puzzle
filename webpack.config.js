@@ -13,7 +13,7 @@ module.exports = (env, options) => {
     entry: ['./src/index.js', './src/sass/style.scss'],
     output: {
       path: path.join(__dirname, './dist'),
-      filename: '[contenthash].js',
+      filename: '[name].[contenthash].js',
     },
 
     plugins: [
@@ -46,13 +46,12 @@ module.exports = (env, options) => {
           use: [{ loader: 'file-loader' }],
         },
         {
-          test: /\.mp3$/,
-          include: '/src',
-          loader: 'file-loader',
-        },
-        {
           test: /\.html$/i,
           loader: 'html-loader',
+        },
+        {
+          test: /\.(mp3|mpe?g)$/,
+          use: ['url-loader'],
         },
         {
           test: /\.(s[ac]ss|css)$/,
