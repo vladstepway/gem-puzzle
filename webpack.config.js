@@ -27,8 +27,10 @@ module.exports = (env, options) => {
         filename: '[contenthash].css',
       }),
       new CopyPlugin({
-        patterns: [{ from: './src/assets/sounds', to: './sounds' }],
-        patterns: [{ from: './src/assets/img', to: './img' }],
+        patterns: [
+          { from: './src/assets/sounds', to: './sounds' },
+          { from: './src/assets/img', to: './img' },
+        ],
       }),
     ],
 

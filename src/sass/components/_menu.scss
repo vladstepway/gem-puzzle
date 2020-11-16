@@ -21,6 +21,13 @@
     margin: 50% 30%;
     font-size: 1.6rem;
   }
+  &-img {
+    width: 3rem;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
   &__item {
     margin: 1rem;
   }

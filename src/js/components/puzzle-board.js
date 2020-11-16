@@ -26,10 +26,12 @@ export default class PuzzleBoard {
   initInfoBoard() {
     this.infoBoard = create('div', 'puzzle__info', null, this.container);
     this.resetButton = create(
-      'button',
-      'reset_button',
-      'reload',
-      this.infoBoard
+      'img',
+      'reset-image',
+      '',
+      this.infoBoard,
+      ['src', './img/refresh.svg'],
+      ['alt', 'refresh']
     );
     this.timeCounter = new Timer(this.infoBoard, this.time);
     this.timeCounter.init();
@@ -60,17 +62,12 @@ export default class PuzzleBoard {
     );
 
     this.menuButton = create(
-      'button',
-      'menu_button',
-      create(
-        'img',
-        'menu-img',
-        '',
-        '',
-        ['src', './img/menu.svg'],
-        ['alt', 'menu']
-      ),
-      this.infoBoard
+      'img',
+      'menu-img',
+      '',
+      this.infoBoard,
+      ['src', './img/menu.svg'],
+      ['alt', 'menu']
     );
     this.menuButton.addEventListener('click', this.openMenu);
     this.resetButton.addEventListener('click', this.reloadGame);
@@ -310,6 +307,14 @@ export default class PuzzleBoard {
 
   saveCurrentGame() {
     const positions = JSON.parse(JSON.stringify(this.currentPositions));
+    const options = {
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+    };
+    const saveDate = new Date().toLocaleString('en-US', options);
     const gameToSave = {
       size: this.boardSize,
       time: {
@@ -319,6 +324,7 @@ export default class PuzzleBoard {
       },
       positions,
       moves: this.movesCount,
+      saveDate,
     };
     return gameToSave;
   }
