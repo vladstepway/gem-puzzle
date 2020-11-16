@@ -17,8 +17,12 @@ export default class PuzzleItem {
       this.div = create('div', cellClass, cellNumber, content);
     }
 
-    this.div.style.left = `${position.left * constants.CELL_SIZE}px`;
-    this.div.style.top = `${position.top * constants.CELL_SIZE}px`;
+    this.div.style.left = `${
+      position.left * constants.CELL_SIZE
+    }px`;
+    this.div.style.top = `${
+      position.top * constants.CELL_SIZE
+    }px`;
     this.div.innerHTML = cellNumber;
     this.connectDrag();
   }
@@ -29,7 +33,6 @@ export default class PuzzleItem {
       e.dataTransfer.effectAllowed = 'all';
       e.dataTransfer.dropEffect = 'move';
     });
-    item.div.addEventListener('dragend', (e) => {
-    });
+    item.div.addEventListener('dragend', (e) => {});
   }
 }

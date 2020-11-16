@@ -1,18 +1,26 @@
 import create from '../utils/create';
 import PuzzleItem from './puzzle-item';
+import Timer from './timer';
 import * as constants from './../utils/constants';
+import * as storage from './../utils/storage';
 
-const main = create('main', '', null);
+const main = create('main', 'main', null);
 export default class PuzzleBoard {
-  constructor({ size }) {
-    // this.settings = settings;
+  constructor({ size, moves, time, positions }) {
     this.boardSize = size;
+    this.currentPositions = positions;
+    this.time = time;
+    this.movesCount = moves;
   }
 
   init() {
     this.container = create('div', 'puzzle', null, main);
     this.initInfoBoard();
     document.body.prepend(main);
+    document
+      .querySelector('.menu_overlay')
+      .classList.remove('menu_overlay-active');
+
     return this;
   }
 
@@ -24,37 +32,59 @@ export default class PuzzleBoard {
       'reload',
       this.infoBoard
     );
-    this.timeCount = '00:00';
-    this.min = 0;
-    this.sec = 0;
-    this.timer = create(
-      'div',
-      'timer',
-      `time ${this.timeCount}`,
-      this.infoBoard
-    );
-    this.movesCount = 0;
-    this.moves = create(
-      'div',
-      'moves',
-      `moves ${this.movesCount}`,
-      this.infoBoard
-    );
+    this.timeCounter = new Timer(this.infoBoard, this.time);
+    this.timeCounter.init();
+    this.moves = create('div', 'moves', `${this.movesCount}`, this.infoBoard);
+
+    const sizeSettings = [];
+    const sizes = {
+      '4x4': 4,
+      '3x3': 3,
+      '5x5': 5,
+      '6x6': 6,
+      '7x7': 7,
+      '8x8': 8,
+    };
+    for (const s in sizes) {
+      sizeSettings.push(
+        create('option', '', s, null, ['value', `${sizes[s]}`])
+      );
+    }
+
     this.sizeBoard = create(
-      'div',
+      'select',
       'size__board',
-      `${this.boardSize}x${this.boardSize}`,
-      this.infoBoard
+      sizeSettings,
+      this.infoBoard,
+      ['id', 'board-size'],
+      ['name', 'board-size']
     );
+
     this.menuButton = create('button', 'menu_button', 'menu', this.infoBoard);
     this.menuButton.addEventListener('click', this.openMenu);
     this.resetButton.addEventListener('click', this.reloadGame);
+    this.sizeBoard.addEventListener('change', this.getSelectedBoardSize);
   }
 
+  getSelectedBoardSize = () => {
+    const sizeBoard = document.querySelector('#board-size');
+    const screenSize = document.body.offsetWidth;
+    const selectedValue = +sizeBoard.options[sizeBoard.options.selectedIndex]
+      .value;
+    if (
+      (screenSize < 768 && selectedValue === 8) ||
+      (screenSize < 500 && selectedValue === 7) ||
+      (screenSize < 425 && selectedValue === 6) ||
+      (screenSize < 375 && selectedValue === 5)
+    ) {
+      return;
+    }
+    this.boardSize = selectedValue;
+    this.reloadGame();
+  };
+
   generatePuzzles() {
-    this.timer.innerHTML = 'time 00:00';
     this.puzzles = [];
-    this.currentPositions = [];
     // Puzzle content
     const puzzleContent = create(
       'div',
@@ -65,10 +95,10 @@ export default class PuzzleBoard {
     this.puzzleContent = puzzleContent;
     puzzleContent.style.width = `${this.boardSize * constants.CELL_SIZE}px`;
     puzzleContent.style.height = `${this.boardSize * constants.CELL_SIZE}px`;
-
     this.createCells(puzzleContent);
     this.connectDroppable();
   }
+
   shufflePuzzles(puzzleAmount) {
     const randomPuzzle = [...Array(puzzleAmount).keys()].sort(
       () => Math.random() - 0.5
@@ -93,26 +123,47 @@ export default class PuzzleBoard {
   }
 
   createCells(puzzleContent) {
-    const puzzleSize = this.boardSize * this.boardSize;
-    const randomArray = this.shufflePuzzles(puzzleSize);
-    for (let i = 0; i < randomArray.length; i++) {
-      const left = i % this.boardSize;
-      const top = (i - left) / this.boardSize;
-      const position = { left, top };
-      const value = randomArray[i];
-      const item = new PuzzleItem(value, puzzleContent, position);
-      if (value === 0) {
-        this.emptyCell = item;
-      }
-      item.div.addEventListener('click', this.changePosition.bind(this, item));
-
-      this.currentPositions.push({
-        value,
-        left: position.left,
-        top: position.top,
-        element: item,
+    if (this.currentPositions.length !== 0) {
+      this.currentPositions.forEach((p) => {
+        const item = new PuzzleItem(p.value, puzzleContent, {
+          left: p.left,
+          top: p.top,
+        });
+        if (p.value === 0) {
+          this.emptyCell = item;
+        }
+        item.div.addEventListener(
+          'click',
+          this.changePosition.bind(this, item)
+        );
+        p.element = item;
+        this.puzzles.push(item);
       });
-      this.puzzles.push(item);
+    } else {
+      const puzzleSize = this.boardSize * this.boardSize;
+      const randomArray = this.shufflePuzzles(puzzleSize);
+      for (let i = 0; i < randomArray.length; i++) {
+        const left = i % this.boardSize;
+        const top = (i - left) / this.boardSize;
+        const position = { left, top };
+        const value = randomArray[i];
+        const item = new PuzzleItem(value, puzzleContent, position);
+        if (value === 0) {
+          this.emptyCell = item;
+        }
+        item.div.addEventListener(
+          'click',
+          this.changePosition.bind(this, item)
+        );
+
+        this.currentPositions.push({
+          value,
+          left: position.left,
+          top: position.top,
+          element: item,
+        });
+        this.puzzles.push(item);
+      }
     }
   }
 
@@ -176,7 +227,7 @@ export default class PuzzleBoard {
       }
     }
     if (this.movesCount === 1) {
-      this.timerId = setInterval(this.changeTimeCounter, 1000);
+      this.timeCounter.startTimer();
     }
 
     const isEndOfTheGame = this.currentPositions.every((p) => {
@@ -186,30 +237,11 @@ export default class PuzzleBoard {
       this.endOfTheGame();
     }
   };
+
   playSound = (sound) => {
     const audio = new Audio();
     audio.src = `./sounds/${sound}.mp3`;
     audio.autoplay = true;
-  };
-  changeTimeCounter = () => {
-    ++this.sec;
-    if (this.sec === 60) {
-      this.sec = 0;
-      ++this.min;
-    }
-    if (this.min < 10) {
-      if (this.sec < 10) {
-        this.timer.innerHTML = `time 0${this.min}:0${this.sec}`;
-      } else {
-        this.timer.innerHTML = `time 0${this.min}:${this.sec}`;
-      }
-    } else {
-      if (this.sec < 10) {
-        this.timer.innerHTML = `time ${this.min}:0${this.sec}`;
-      } else {
-        this.timer.innerHTML = `time ${++this.min}:${this.sec}`;
-      }
-    }
   };
 
   isNotClosestCell(currentCell, emptyCell) {
@@ -225,17 +257,15 @@ export default class PuzzleBoard {
 
   reloadGame = () => {
     this.changeMovesCount(0);
-    clearInterval(this.timerId);
-    this.sec = 0;
-    this.min = 0;
+    this.timeCounter.resetTimer();
     this.container.removeChild(this.puzzleContent);
-
+    this.currentPositions = [];
     this.generatePuzzles();
     this.playSound('reload');
   };
   changeMovesCount(count) {
     this.movesCount = count;
-    this.moves.innerHTML = `moves ${this.movesCount}`;
+    this.moves.innerHTML = `${this.movesCount}`;
   }
 
   connectDroppable() {
@@ -261,8 +291,24 @@ export default class PuzzleBoard {
   }
 
   openMenu = () => {
+    this.timeCounter.pauseTimer();
     const menu = document.querySelector('.menu_overlay');
     menu.classList.add('menu_overlay-active');
     this.playSound('menu');
   };
+
+  saveCurrentGame() {
+    const positions = JSON.parse(JSON.stringify(this.currentPositions));
+    const gameToSave = {
+      size: this.boardSize,
+      time: {
+        value: this.timeCounter.time,
+        min: this.timeCounter.min,
+        sec: this.timeCounter.sec,
+      },
+      positions,
+      moves: this.movesCount,
+    };
+    return gameToSave;
+  }
 }
