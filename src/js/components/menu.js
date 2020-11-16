@@ -32,10 +32,7 @@ export default class Menu {
   }
 
   startGame = () => {
-    if (this.puzzleBoard) {
-      const main = document.querySelector('main');
-      main.removeChild(main.firstChild);
-    }
+    this.removePuzzleBoard();
     this.puzzleBoard = new PuzzleBoard(this.settings);
     this.puzzleBoard.init().generatePuzzles();
     this.puzzleBoard.playSound('new');
@@ -60,6 +57,16 @@ export default class Menu {
     this.puzzleBoard.reloadGame();
     this.removeGameList();
     this.overlay.classList.remove('menu_overlay-active');
+  };
+
+  removePuzzleBoard = () => {
+    if (this.puzzleBoard) {
+      const main = document.querySelector('main');
+      main.removeChild(document.querySelector('.puzzle'));
+      this.settings.positions = [];
+      this.puzzleBoard.currentPositions = [];
+      this.puzzleBoard = undefined;
+    }
   };
 
   removeGameList = () => {
@@ -95,18 +102,10 @@ export default class Menu {
   };
 
   selectGame = (selectedGame) => {
-    if (this.puzzleBoard) {
-      this.puzzleBoard.currentPositions = [];
-      const main = document.querySelector('main');
-      main.removeChild(main.firstChild);
-    }
+    this.removePuzzleBoard();
     this.puzzleBoard = new PuzzleBoard(selectedGame);
     this.puzzleBoard.init().generatePuzzles();
-    if (this.gameList) {
-      const menu = document.querySelector('.menu_overlay');
-      menu.removeChild(document.querySelector('.game-list'));
-      this.gameList = undefined;
-    }
+    this.removeGameList();
     this.puzzleBoard.playSound('load');
     this.puzzleBoard.timeCounter.resumeTimer();
   };
