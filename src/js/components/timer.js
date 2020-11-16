@@ -15,16 +15,20 @@ export default class Timer {
   getTimer = () => {
     return this.time;
   };
+
   startTimer = () => {
     this.timerId = setInterval(this.changeTimeCounter, 1000);
     setInterval(this.getTimer, 1000);
   };
+
   pauseTimer = () => {
     clearInterval(this.timerId);
   };
+
   resumeTimer = () => {
     this.timerId = setInterval(this.changeTimeCounter, 1000);
   };
+
   resetTimer = () => {
     clearInterval(this.timerId);
     this.sec = 0;
@@ -34,10 +38,10 @@ export default class Timer {
   };
 
   changeTimeCounter = () => {
-    ++this.sec;
+    this.sec += 1;
     if (this.sec === 60) {
       this.sec = 0;
-      ++this.min;
+      this.min += 1;
     }
     this.time = `${this.addZero(this.min)}:${this.addZero(this.sec)}`;
     this.timer.innerHTML = this.time;

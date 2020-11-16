@@ -44,7 +44,6 @@ export default class Menu {
   };
 
   resumeGame = () => {
-   
     if (!this.puzzleBoard) {
       return;
     }
