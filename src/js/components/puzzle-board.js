@@ -2,7 +2,6 @@ import create from '../utils/create';
 import PuzzleItem from './puzzle-item';
 import Timer from './timer';
 import * as constants from './../utils/constants';
-import * as storage from './../utils/storage';
 
 const main = create('main', 'main', null);
 export default class PuzzleBoard {
@@ -60,7 +59,19 @@ export default class PuzzleBoard {
       ['name', 'board-size']
     );
 
-    this.menuButton = create('button', 'menu_button', 'menu', this.infoBoard);
+    this.menuButton = create(
+      'button',
+      'menu_button',
+      create(
+        'img',
+        'menu-img',
+        '',
+        '',
+        ['src', './img/menu.svg'],
+        ['alt', 'menu']
+      ),
+      this.infoBoard
+    );
     this.menuButton.addEventListener('click', this.openMenu);
     this.resetButton.addEventListener('click', this.reloadGame);
     this.sizeBoard.addEventListener('change', this.getSelectedBoardSize);

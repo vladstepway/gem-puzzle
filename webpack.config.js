@@ -28,6 +28,7 @@ module.exports = (env, options) => {
       }),
       new CopyPlugin({
         patterns: [{ from: './src/assets/sounds', to: './sounds' }],
+        patterns: [{ from: './src/assets/img', to: './img' }],
       }),
     ],
 
