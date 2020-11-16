@@ -1,7 +1,7 @@
 import create from '../utils/create';
 import PuzzleItem from './puzzle-item';
 import Timer from './timer';
-import * as constants from './../utils/constants';
+import * as constants from '../utils/constants';
 
 const main = create('main', 'main', null);
 export default class PuzzleBoard {
@@ -47,9 +47,11 @@ export default class PuzzleBoard {
       '8x8': 8,
     };
     for (const s in sizes) {
-      sizeSettings.push(
-        create('option', '', s, null, ['value', `${sizes[s]}`])
-      );
+      if ({}.hasOwnproperty.call(sizes, s)) {
+        sizeSettings.push(
+          create('option', '', s, null, ['value', `${sizes[s]}`])
+        );
+      }
     }
 
     this.sizeBoard = create(
@@ -118,11 +120,11 @@ export default class PuzzleBoard {
 
   isValidPuzzleCombination(randomPuzzle) {
     let sum = 0;
-    for (let i = 0; i < randomPuzzle.length; i++) {
+    for (let i = 0; i < randomPuzzle.length; i += 1) {
       let counter = 0;
-      for (let j = i + 1; j < randomPuzzle.length - 1; j++) {
+      for (let j = i + 1; j < randomPuzzle.length - 1; j += 1) {
         if (randomPuzzle[i] > randomPuzzle[j]) {
-          counter++;
+          counter += 1;
         }
       }
       sum += counter;
@@ -150,7 +152,7 @@ export default class PuzzleBoard {
     } else {
       const puzzleSize = this.boardSize * this.boardSize;
       const randomArray = this.shufflePuzzles(puzzleSize);
-      for (let i = 0; i < randomArray.length; i++) {
+      for (let i = 0; i < randomArray.length; i += 1) {
         const left = i % this.boardSize;
         const top = (i - left) / this.boardSize;
         const position = { left, top };
@@ -197,42 +199,42 @@ export default class PuzzleBoard {
     const emptyPuzzleCell = this.findPuzzleItem(this.emptyCell);
     const puzzleCell = this.findPuzzleItem(item);
 
-    if (this.isNotClosestCell(puzzleCell, emptyPuzzleCell)) {
-      return;
-    } else {
+    if (!this.isNotClosestCell(puzzleCell, emptyPuzzleCell)) {
       if (puzzleCell.value === emptyPuzzleCell.value) {
         return;
-      } else {
-        puzzleCell.element.div.style.left = `${
-          emptyPuzzleCell.left * constants.CELL_SIZE
-        }px`;
-        emptyPuzzleCell.element.div.style.left = `${
-          puzzleCell.left * constants.CELL_SIZE
-        }px`;
-
-        puzzleCell.element.div.style.top = `${
-          emptyPuzzleCell.top * constants.CELL_SIZE
-        }px`;
-        emptyPuzzleCell.element.div.style.top = `${
-          puzzleCell.top * constants.CELL_SIZE
-        }px`;
-
-        const emptyLeft = this.emptyCell.position.left;
-        const emptyTop = this.emptyCell.position.top;
-
-        this.emptyCell.left = puzzleCell.left;
-        this.emptyCell.top = puzzleCell.top;
-        this.emptyCell.position.left = puzzleCell.left;
-        this.emptyCell.position.top = puzzleCell.top;
-
-        emptyPuzzleCell.left = puzzleCell.left;
-        emptyPuzzleCell.top = puzzleCell.top;
-
-        puzzleCell.left = emptyLeft;
-        puzzleCell.top = emptyTop;
-        this.changeMovesCount(++this.movesCount);
-        this.playSound('move');
       }
+
+      puzzleCell.element.div.style.left = `${
+        emptyPuzzleCell.left * constants.CELL_SIZE
+      }px`;
+      emptyPuzzleCell.element.div.style.left = `${
+        puzzleCell.left * constants.CELL_SIZE
+      }px`;
+
+      puzzleCell.element.div.style.top = `${
+        emptyPuzzleCell.top * constants.CELL_SIZE
+      }px`;
+      emptyPuzzleCell.element.div.style.top = `${
+        puzzleCell.top * constants.CELL_SIZE
+      }px`;
+
+      const emptyLeft = this.emptyCell.position.left;
+      const emptyTop = this.emptyCell.position.top;
+
+      this.emptyCell.left = puzzleCell.left;
+      this.emptyCell.top = puzzleCell.top;
+      this.emptyCell.position.left = puzzleCell.left;
+      this.emptyCell.position.top = puzzleCell.top;
+
+      emptyPuzzleCell.left = puzzleCell.left;
+      emptyPuzzleCell.top = puzzleCell.top;
+
+      puzzleCell.left = emptyLeft;
+      puzzleCell.top = emptyTop;
+      this.changeMovesCount((this.movesCount += 1));
+      this.playSound('move');
+    } else {
+      return;
     }
     if (this.movesCount === 1) {
       this.timeCounter.startTimer();
@@ -260,7 +262,6 @@ export default class PuzzleBoard {
 
   endOfTheGame = () => {
     this.playSound('win');
-    alert('You win');
   };
 
   reloadGame = () => {
@@ -271,6 +272,7 @@ export default class PuzzleBoard {
     this.generatePuzzles();
     this.playSound('reload');
   };
+
   changeMovesCount(count) {
     this.movesCount = count;
     this.moves.innerHTML = `${this.movesCount}`;
@@ -278,12 +280,13 @@ export default class PuzzleBoard {
 
   connectDroppable() {
     let dragged = '';
-    const puzzleContent = this.puzzleContent;
+    const { puzzleContent } = this;
     puzzleContent.addEventListener('drag', (e) => {
       e.preventDefault();
       dragged = e.target;
     });
-    puzzleContent.addEventListener('dragstart', (e) => {});
+    puzzleContent.addEventListener('dragstart', (e) => {
+    });
     puzzleContent.addEventListener('dragover', (e) => {
       e.preventDefault();
     });
@@ -292,8 +295,6 @@ export default class PuzzleBoard {
       if (e.target.innerText === '') {
         const puzzleItem = this.findPuzzleItemByValue(dragged.innerText);
         this.changePosition(puzzleItem.element);
-      } else {
-        return;
       }
     });
   }
